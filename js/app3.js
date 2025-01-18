@@ -154,6 +154,8 @@ var housePositions = [
 
 /**
  * Draws the South Indian Rasi chart (in SVG) at specified coords and size.
+ * Highlights houses 4,7,10 from Lagna in light blue, houses 5,9 from Lagna in light green,
+ * and the Lagna house itself in light blue-green.
  * @param {number} x - Top-left x offset.
  * @param {number} y - Top-left y offset.
  * @param {number} w - Chart width.
@@ -164,58 +166,95 @@ var housePositions = [
  * @returns {string} An SVG string representing the chart.
  */
 function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime) {
-  let mx = w / 4;  // width of each house
-  let my = h / 4;  // height of each house
-  let bw = w / 8;  // offset within each house for planet text
+  const mx = w / 4;  // width of each house
+  const my = h / 4;  // height of each house
+  const bw = w / 8;  // offset within each house for planet text
 
   let s = '<g>\n';
-  let planetCounts = new Array(12).fill(0); // track #planets in each house
+  const planetCounts = new Array(12).fill(0); // track #planets in each house
+
+  // Identify Lagna's house index (0..11)
+  let lagnaIndex = null;
+  const ascPlanet = planetDetails.find(p => p.name === 'லக்னம்');
+  if (ascPlanet && !isNaN(ascPlanet.longitude)) {
+    lagnaIndex = Math.floor((ascPlanet.longitude % 360) / 30);
+  }
+
+  // Helper function to mod 12 easily
+  const mod12 = (num) => ((num % 12) + 12) % 12;
+
+  // If we do have a valid Lagna, define the special houses relative to it
+  let house4, house5, house7, house9, house10;
+  if (lagnaIndex !== null) {
+    house4 = mod12(lagnaIndex + 3);
+    house5 = mod12(lagnaIndex + 4);
+    house7 = mod12(lagnaIndex + 6);
+    house9 = mod12(lagnaIndex + 8);
+    house10 = mod12(lagnaIndex + 9);
+  }
 
   // Draw chart houses
-  housePositions.forEach((pos) => {
-    let xd = x + pos.col * mx;
-    let yd = y + pos.row * my;
-    s += '<rect x="' + xd + '" y="' + yd + '" width="' + mx + '" height="' + my +
-         '" style="fill:none;stroke:black;stroke-width:2"/>\n';
+  housePositions.forEach((pos, index) => {
+    const xd = x + pos.col * mx;
+    const yd = y + pos.row * my;
+
+    // Default fill is none
+    let fillColor = 'none';
+
+    if (lagnaIndex !== null) {
+      // House of Lagna itself
+      if (index === lagnaIndex) {
+        fillColor = '#bbeeee'; // light blue-green
+      }
+      // 4, 7, 10 from Lagna -> light blue
+      else if (index === house4 || index === house7 || index === house10) {
+        fillColor = '#e0f7fa'; 
+      }
+      // 5, 9 from Lagna -> light green
+      else if (index === house5 || index === house9) {
+        fillColor = '#e8f6e9';
+      }
+    }
+
+    s += `<rect x="${xd}" y="${yd}" width="${mx}" height="${my}" 
+          style="fill:${fillColor};stroke:black;stroke-width:2"/>\n`;
   });
 
   // Place planets in correct house based on longitude
   planetDetails.forEach((planet) => {
-    let houseIndex = Math.floor((planet.longitude % 360) / 30); // 0..11
-    let position = housePositions[houseIndex];
-    let count = planetCounts[houseIndex];
-    let cellX = x + position.col * mx - 10;
-    let cellY = y + position.row * my + (count * 15); 
-    let planetName = planet.name;
+    const houseIndex = Math.floor((planet.longitude % 360) / 30); // 0..11
+    const position = housePositions[houseIndex];
+    const count = planetCounts[houseIndex];
+    const cellX = x + position.col * mx - 10;
+    const cellY = y + position.row * my + (count * 15);
+    const planetName = planet.name;
 
-    s += '<text x="' + (cellX + bw / 2) + 
-         '" y="' + (cellY + my / 2) + 
-         '" fill="black" font-size="14" font-family="monospace">' +
-         planetName + '</text>\n';
+    s += `<text x="${cellX + bw / 2}" y="${cellY + my / 2}" 
+          fill="black" font-size="14" font-family="monospace">
+          ${planetName}</text>\n`;
 
     planetCounts[houseIndex]++;
   });
 
   // Center text inside the chart
-  let centerX = x + w / 2;
-  let centerY = y + h / 2;
+  const centerX = x + w / 2;
+  const centerY = y + h / 2;
 
-  s += '<text x="' + centerX + 
-       '" y="' + (centerY - 20) + 
-       '" fill="black" font-size="12" font-family="monospace" text-anchor="middle">ஸ்ரீ கற்பக விநாயகர் துணை</text>\n';
-  s += '<text x="' + centerX + 
-       '" y="' + centerY + 
-       '" fill="black" font-size="16" font-family="monospace" text-anchor="middle">ராசி</text>\n';
+  s += `<text x="${centerX}" y="${centerY - 20}" 
+        fill="black" font-size="12" font-family="monospace" 
+        text-anchor="middle">ஸ்ரீ கற்பக விநாயகர் துணை</text>\n`;
 
-  s += '<text x="' + centerX + 
-       '" y="' + (centerY + 20) + 
-       '" fill="black" font-size="16" font-family="monospace" text-anchor="middle">' +
-       currentDate + '</text>\n';
+  s += `<text x="${centerX}" y="${centerY}" 
+        fill="black" font-size="16" font-family="monospace" 
+        text-anchor="middle">ராசி</text>\n`;
 
-  s += '<text x="' + centerX + 
-       '" y="' + (centerY + 40) + 
-       '" fill="black" font-size="16" font-family="monospace" text-anchor="middle">' +
-       currentTime + '</text>\n';
+  s += `<text x="${centerX}" y="${centerY + 20}" 
+        fill="black" font-size="16" font-family="monospace" 
+        text-anchor="middle">${currentDate}</text>\n`;
+
+  s += `<text x="${centerX}" y="${centerY + 40}" 
+        fill="black" font-size="16" font-family="monospace" 
+        text-anchor="middle">${currentTime}</text>\n`;
 
   s += '</g>\n';
   return s;
