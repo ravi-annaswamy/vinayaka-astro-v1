@@ -168,22 +168,44 @@ var housePositions = [
 function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime) {
   const mx = w / 4;  // width of each house
   const my = h / 4;  // height of each house
-  const bw = w / 8;  // offset within each house for planet text
-
   let s = '<g>\n';
-  const planetCounts = new Array(12).fill(0); // track #planets in each house
+  
+  // Glyph mapping: key = full name from planetDetails, value = new glyph.
+  const glyphMapping = {
+    'லக்னம்': 'லக்',
+    'சூரியன்':  'சூரி',
+    'சந்திரன்':  'சந்',
+    'செவ்வாய்': 'செவ்',
+    'புதன்': 'புத',
+    'குரு': 'குரு',
+    'சுக்கிரன்':  'சுக்',
+    'சனி': 'சனி',
+    'ராகு': 'ராகு',
+    'கேது': 'கேது',
+  };
 
-  // Identify Lagna's house index (0..11)
+  // Create an array (for 12 houses) to group glyphs.
+  let housePlanets = [];
+  for (let i = 0; i < 12; i++) {
+    housePlanets.push([]);
+  }
+  
+  // Group each planet’s glyph into its corresponding house.
+  planetDetails.forEach((planet) => {
+    const houseIndex = Math.floor((planet.longitude % 360) / 30);
+    const glyph = glyphMapping[planet.name] || planet.name;
+    housePlanets[houseIndex].push(glyph);
+  });
+
+  // Identify Lagna's house index (if available) for background color highlights.
   let lagnaIndex = null;
   const ascPlanet = planetDetails.find(p => p.name === 'லக்னம்');
   if (ascPlanet && !isNaN(ascPlanet.longitude)) {
     lagnaIndex = Math.floor((ascPlanet.longitude % 360) / 30);
   }
-
-  // Helper function to mod 12 easily
+  
+  // Helper function for mod 12 and define special houses.
   const mod12 = (num) => ((num % 12) + 12) % 12;
-
-  // If we do have a valid Lagna, define the special houses relative to it
   let house4, house5, house7, house9, house10;
   if (lagnaIndex !== null) {
     house4 = mod12(lagnaIndex + 3);
@@ -193,72 +215,57 @@ function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime) {
     house10 = mod12(lagnaIndex + 9);
   }
 
-  // Draw chart houses
+  // Draw the chart houses (rectangles) with the same background rules.
   housePositions.forEach((pos, index) => {
     const xd = x + pos.col * mx;
     const yd = y + pos.row * my;
-
-    // Default fill is none
     let fillColor = 'none';
-
     if (lagnaIndex !== null) {
-      // House of Lagna itself
       if (index === lagnaIndex) {
-        fillColor = '#bbeeee'; // light blue-green
-      }
-      // 4, 7, 10 from Lagna -> light blue
-      else if (index === house4 || index === house7 || index === house10) {
-        fillColor = '#e0f7fa'; 
-      }
-      // 5, 9 from Lagna -> light green
-      else if (index === house5 || index === house9) {
-        fillColor = '#e8f6e9';
+        fillColor = '#bbeeee'; // Lagna house: light blue-green
+      } else if (index === house4 || index === house7 || index === house10) {
+        fillColor = '#e0f7fa'; // Houses 4, 7, 10: light blue
+      } else if (index === house5 || index === house9) {
+        fillColor = '#e8f6e9'; // Houses 5, 9: light green
       }
     }
-
-    s += `<rect x="${xd}" y="${yd}" width="${mx}" height="${my}" 
-          style="fill:${fillColor};stroke:black;stroke-width:2"/>\n`;
+    s += `<rect x="${xd}" y="${yd}" width="${mx}" height="${my}" style="fill:${fillColor};stroke:black;stroke-width:2"/>\n`;
   });
+  
+  // For each house, layout the glyphs in a two-column grid centered in the cell.
+  const rowHeight = 22; // vertical space for each row
+  for (let i = 0; i < 12; i++) {
+    const glyphs = housePlanets[i];
+    if (glyphs.length > 0) {
+      const pos = housePositions[i];
+      const cellX = x + pos.col * mx;
+      const cellY = y + pos.row * my;
+      const numRows = Math.ceil(glyphs.length / 2);
+      const totalGridHeight = numRows * rowHeight;
+      const verticalOffset = (my - totalGridHeight) / 2;
+      for (let j = 0; j < glyphs.length; j++) {
+        const row = Math.floor(j / 2);
+        const col = j % 2;
+        const glyphX = (glyphs.length === 1) ? cellX + (mx / 2) : cellX + (col === 0 ? (mx * 0.30) : (mx * 0.70));
+        const glyphY = cellY + verticalOffset + (row * rowHeight) + (rowHeight / 2);
+        // s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${glyphs[j]}</text>\n`;
+        s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="18" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${glyphs[j]}</text>\n`;
 
-  // Place planets in correct house based on longitude
-  planetDetails.forEach((planet) => {
-    const houseIndex = Math.floor((planet.longitude % 360) / 30); // 0..11
-    const position = housePositions[houseIndex];
-    const count = planetCounts[houseIndex];
-    const cellX = x + position.col * mx - 10;
-    const cellY = y + position.row * my + (count * 15);
-    const planetName = planet.name;
-
-    s += `<text x="${cellX + bw / 2}" y="${cellY + my / 2}" 
-          fill="black" font-size="14" font-family="monospace">
-          ${planetName}</text>\n`;
-
-    planetCounts[houseIndex]++;
-  });
-
-  // Center text inside the chart
+      }
+    }
+  }
+  
+  // Center the chart title and date/time information.
   const centerX = x + w / 2;
   const centerY = y + h / 2;
-
-  s += `<text x="${centerX}" y="${centerY - 20}" 
-        fill="black" font-size="12" font-family="monospace" 
-        text-anchor="middle">ஸ்ரீ கற்பக விநாயகர் துணை</text>\n`;
-
-  s += `<text x="${centerX}" y="${centerY}" 
-        fill="black" font-size="16" font-family="monospace" 
-        text-anchor="middle">ராசி</text>\n`;
-
-  s += `<text x="${centerX}" y="${centerY + 20}" 
-        fill="black" font-size="16" font-family="monospace" 
-        text-anchor="middle">${currentDate}</text>\n`;
-
-  s += `<text x="${centerX}" y="${centerY + 40}" 
-        fill="black" font-size="16" font-family="monospace" 
-        text-anchor="middle">${currentTime}</text>\n`;
-
+  s += `<text x="${centerX}" y="${centerY - 20}" fill="black" font-size="12" font-family="monospace" text-anchor="middle">ஸ்ரீ கற்பக விநாயகர் துணை</text>\n`;
+  s += `<text x="${centerX}" y="${centerY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">ராசி</text>\n`;
+  s += `<text x="${centerX}" y="${centerY + 20}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentDate}</text>\n`;
+  s += `<text x="${centerX}" y="${centerY + 40}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentTime}</text>\n`;
   s += '</g>\n';
   return s;
 }
+
 
 /**
  * Draws the Navamsa chart (in SVG).
@@ -270,49 +277,69 @@ function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime) {
  * @returns {string} An SVG string representing the Navamsa chart.
  */
 function drawNavamsaChart(x, y, w, h, planetDetails) {
-  let mx = w / 4; // width of each house
-  let my = h / 4; // height of each house
-  let bw = w / 8; // offset within each house for planet text
-
+  const mx = w / 4; // width of each house
+  const my = h / 4; // height of each house
   let s = '<g>\n';
-  let planetCounts = new Array(12).fill(0);
+  
+  // Glyph mapping: key = full name, value = new glyph.
+  const glyphMapping = {
+    'லக்னம்': 'லக்',
+    'சூரியன்':  'சூரி',
+    'சந்திரன்':  'சந்',
+    'செவ்வாய்': 'செவ்',
+    'புதன்': 'புத',
+    'குரு': 'குரு',
+    'சுக்கிரன்':  'சுக்',
+    'சனி': 'சனி',
+    'ராகு': 'ராகு',
+    'கேது': 'கேது',
+  };
 
-  // Draw chart houses
-  housePositions.forEach((pos) => {
-    let xd = x + pos.col * mx;
-    let yd = y + pos.row * my;
-    s += '<rect x="' + xd + 
-         '" y="' + yd + 
-         '" width="' + mx + 
-         '" height="' + my + 
-         '" style="fill:none;stroke:black;stroke-width:2"/>\n';
-  });
-
-  // Place planets based on their Navamsa sign
+  // Create an array (for 12 houses) to group glyphs by navamsa.
+  let housePlanets = [];
+  for (let i = 0; i < 12; i++) {
+    housePlanets.push([]);
+  }
+  
+  // Group each planet’s glyph into its corresponding navamsa house.
   planetDetails.forEach((planet) => {
     let navamsaSign = calculateNavamsaPosition(planet.longitude);
-    let position = housePositions[navamsaSign];
-    let count = planetCounts[navamsaSign];
-    let cellX = x + position.col * mx - 10;
-    let cellY = y + position.row * my + (count * 15);
-    let planetName = planet.name;
-
-    s += '<text x="' + (cellX + bw / 2) + 
-         '" y="' + (cellY + my / 2) + 
-         '" fill="black" font-size="14" font-family="monospace">' +
-         planetName + '</text>\n';
-
-    planetCounts[navamsaSign]++;
+    const glyph = glyphMapping[planet.name] || planet.name;
+    housePlanets[navamsaSign].push(glyph);
   });
 
-  // Center text
-  let centerX = x + w / 2;
-  let centerY = y + h / 2;
-
-  s += '<text x="' + centerX + 
-       '" y="' + centerY + 
-       '" fill="black" font-size="16" font-family="monospace" text-anchor="middle">நவாம்சம்</text>\n';
-
+  // Draw the chart grid (houses).
+  housePositions.forEach((pos) => {
+    const xd = x + pos.col * mx;
+    const yd = y + pos.row * my;
+    s += `<rect x="${xd}" y="${yd}" width="${mx}" height="${my}" style="fill:none;stroke:black;stroke-width:2"/>\n`;
+  });
+  
+  // For each house, layout the glyphs in a two-column grid centered in the cell.
+  const rowHeight = 22; // vertical space for each row
+  for (let i = 0; i < 12; i++) {
+    const glyphs = housePlanets[i];
+    if (glyphs.length > 0) {
+      const pos = housePositions[i];
+      const cellX = x + pos.col * mx;
+      const cellY = y + pos.row * my;
+      const numRows = Math.ceil(glyphs.length / 2);
+      const totalGridHeight = numRows * rowHeight;
+      const verticalOffset = (my - totalGridHeight) / 2;
+      for (let j = 0; j < glyphs.length; j++) {
+        const row = Math.floor(j / 2);
+        const col = j % 2;
+        const glyphX = (glyphs.length === 1) ? cellX + (mx / 2) : cellX + (col === 0 ? (mx * 0.30) : (mx * 0.70));
+        const glyphY = cellY + verticalOffset + (row * rowHeight) + (rowHeight / 2);
+        s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="18" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${glyphs[j]}</text>\n`;
+      }
+    }
+  }
+  
+  // Center the Navamsa chart label.
+  const centerX = x + w / 2;
+  const centerY = y + h / 2;
+  s += `<text x="${centerX}" y="${centerY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">நவாம்சம்</text>\n`;
   s += '</g>\n';
   return s;
 }
@@ -609,7 +636,7 @@ function displayPlanetaryTable(planetaryPositions, planetaryPositionsLater) {
         <th>கிரகம்</th>
         <th>நிலை</th>
         <th>நட்சத்திரம்</th>
-        <th>நட்சத்திராதிபதி</th>
+        <th>நட். அதிபதி</th>
         <th>பாகை</th>
       </tr>
   `;
@@ -824,7 +851,7 @@ function makeDashaTables(dashas, birthJD, offsetNow) {
       }
     }
 
-    bhuktiTable = '<h4>நடப்பு தசை: ' + currentDashaLord + '<br>புக்தி விவரம்</h4>' +
+    bhuktiTable = '<h4>' + currentDashaLord + ' தசாபுக்தி வரிசை</h4>' +
                   '<table><thead><tr>' +
                   '<th>புக்தி</th>' +
                   '<th>தொடக்கம்</th>' +
@@ -850,8 +877,10 @@ function makeDashaTables(dashas, birthJD, offsetNow) {
   }
 
   // Return side-by-side in a container
-  return '<div class="dasha-container">' + dashaTable + bhuktiTable + '</div>';
-}
+  return '<div class="dasha-container">' +
+           '<div class="dasha-item">' + dashaTable + '</div>' +
+           '<div class="dasha-item">' + bhuktiTable + '</div>' +
+         '</div>';}
 
 /**
  * Example function to display dashas in older style.
