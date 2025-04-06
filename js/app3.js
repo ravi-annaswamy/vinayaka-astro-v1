@@ -45,7 +45,7 @@ var indianZodiac = [
   'Meena'
 ];
 var indianZodiacTamil = [
-  'மேஷம் ',
+  'மேஷம்',
   'ரிஷபம்',
   'மிதுனம்',
   'கடகம்',
