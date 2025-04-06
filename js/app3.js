@@ -107,12 +107,13 @@ var nakshatraLordsTamil = [
  * @returns {{nakshatra: string, pada: number}} 
  */
 function calculateNakshatraPada(degree) {
-  const degreesPerNakshatra = 13.33;
-  const degreesPerPada = 3.333;
+  const degreesPerNakshatra = 40 / 3;  // exactly 13.3333...
+  const degreesPerPada = 10 / 3;       // exactly 3.3333...
 
-  const nakshatraIndex = Math.floor(degree / degreesPerNakshatra);
-  const pada = Math.floor(degree / degreesPerPada) % 4 + 1;
-  const nakshatraName = nakshatraNamesTamil[nakshatraIndex % 27];
+  const nakshatraIndex = Math.floor(degree / degreesPerNakshatra) % 27;
+  const pada = Math.floor((degree % degreesPerNakshatra) / degreesPerPada) + 1;
+
+  const nakshatraName = nakshatraNamesTamil[nakshatraIndex];
   return { nakshatra: nakshatraName, pada: pada };
 }
 
