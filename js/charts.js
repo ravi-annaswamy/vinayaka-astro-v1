@@ -1,0 +1,236 @@
+/* 
+   House layout for a standard South Indian chart.
+   Each house index (0-11) points to row/col coords for drawing.
+*/
+var housePositions = [
+  { row: 0, col: 1 }, // Aries
+  { row: 0, col: 2 }, // Taurus
+  { row: 0, col: 3 }, // Gemini
+  { row: 1, col: 3 }, // Cancer
+  { row: 2, col: 3 }, // Leo
+  { row: 3, col: 3 }, // Virgo
+  { row: 3, col: 2 }, // Libra
+  { row: 3, col: 1 }, // Scorpio
+  { row: 3, col: 0 }, // Sagittarius
+  { row: 2, col: 0 }, // Capricorn
+  { row: 1, col: 0 }, // Aquarius
+  { row: 0, col: 0 }  // Pisces
+];
+
+/**
+ * Draws the South Indian Rasi chart (in SVG) at specified coords and size.
+ * Highlights houses 4,7,10 from Lagna in light blue, houses 5,9 from Lagna in light green,
+ * and the Lagna house itself in light blue-green.
+ * @param {number} x - Top-left x offset.
+ * @param {number} y - Top-left y offset.
+ * @param {number} w - Chart width.
+ * @param {number} h - Chart height.
+ * @param {Array} planetDetails - Planet info array.
+ * @param {string} currentDate - String for the current date.
+ * @param {string} currentTime - String for the current time.
+ * @returns {string} An SVG string representing the chart.
+ */
+function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime) {
+  const mx = w / 4;  // width of each house
+  const my = h / 4;  // height of each house
+  let s = '<g>\n';
+  
+  // Glyph mapping: key = full name from planetDetails, value = new glyph.
+  const glyphMapping = {
+    'லக்னம்': 'லக்',
+    'சூரியன்':  'சூரி',
+    'சந்திரன்':  'சந்',
+    'செவ்வாய்': 'செவ்',
+    'புதன்': 'புத',
+    'குரு': 'குரு',
+    'சுக்கிரன்':  'சுக்',
+    'சனி': 'சனி',
+    'ராகு': 'ராகு',
+    'கேது': 'கேது',
+  };
+
+  // Create an array (for 12 houses) to group glyphs.
+  let housePlanets = [];
+  for (let i = 0; i < 12; i++) {
+    housePlanets.push([]);
+  }
+  
+  // Group each planet’s glyph into its corresponding house.
+  planetDetails.forEach((planet) => {
+    const houseIndex = Math.floor((planet.longitude % 360) / 30);
+    const glyph = glyphMapping[planet.name] || planet.name;
+    housePlanets[houseIndex].push(glyph);
+  });
+
+  // Identify Lagna's house index (if available) for background color highlights.
+  let lagnaIndex = null;
+  const ascPlanet = planetDetails.find(p => p.name === 'லக்னம்');
+  if (ascPlanet && !isNaN(ascPlanet.longitude)) {
+    lagnaIndex = Math.floor((ascPlanet.longitude % 360) / 30);
+  }
+  
+  // Helper function for mod 12 and define special houses.
+  const mod12 = (num) => ((num % 12) + 12) % 12;
+  let house4, house5, house7, house9, house10;
+  if (lagnaIndex !== null) {
+    house4 = mod12(lagnaIndex + 3);
+    house5 = mod12(lagnaIndex + 4);
+    house7 = mod12(lagnaIndex + 6);
+    house9 = mod12(lagnaIndex + 8);
+    house10 = mod12(lagnaIndex + 9);
+  }
+
+  // Draw the chart houses (rectangles) with the same background rules.
+  housePositions.forEach((pos, index) => {
+    const xd = x + pos.col * mx;
+    const yd = y + pos.row * my;
+    let fillColor = 'none';
+    if (lagnaIndex !== null) {
+      if (index === lagnaIndex) {
+        fillColor = '#bbeeee'; // Lagna house: light blue-green
+      } else if (index === house4 || index === house7 || index === house10) {
+        fillColor = '#e0f7fa'; // Houses 4, 7, 10: light blue
+      } else if (index === house5 || index === house9) {
+        fillColor = '#e8f6e9'; // Houses 5, 9: light green
+      }
+    }
+    s += `<rect x="${xd}" y="${yd}" width="${mx}" height="${my}" style="fill:${fillColor};stroke:black;stroke-width:2"/>\n`;
+  });
+  
+  // For each house, layout the glyphs in a two-column grid centered in the cell.
+  const rowHeight = 22; // vertical space for each row
+  for (let i = 0; i < 12; i++) {
+    const glyphs = housePlanets[i];
+    if (glyphs.length > 0) {
+      const pos = housePositions[i];
+      const cellX = x + pos.col * mx;
+      const cellY = y + pos.row * my;
+      const numRows = Math.ceil(glyphs.length / 2);
+      const totalGridHeight = numRows * rowHeight;
+      const verticalOffset = (my - totalGridHeight) / 2;
+      for (let j = 0; j < glyphs.length; j++) {
+        const row = Math.floor(j / 2);
+        const col = j % 2;
+        const glyphX = (glyphs.length === 1) ? cellX + (mx / 2) : cellX + (col === 0 ? (mx * 0.30) : (mx * 0.70));
+        const glyphY = cellY + verticalOffset + (row * rowHeight) + (rowHeight / 2);
+        // s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${glyphs[j]}</text>\n`;
+        s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="18" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${glyphs[j]}</text>\n`;
+
+      }
+    }
+  }
+  
+  // Center the chart title and date/time information.
+  const centerX = x + w / 2;
+  const centerY = y + h / 2;
+  s += `<text x="${centerX}" y="${centerY - 20}" fill="black" font-size="12" font-family="monospace" text-anchor="middle">ஸ்ரீ கற்பக விநாயகர் துணை</text>\n`;
+  s += `<text x="${centerX}" y="${centerY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">ராசி</text>\n`;
+  s += `<text x="${centerX}" y="${centerY + 20}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentDate}</text>\n`;
+  s += `<text x="${centerX}" y="${centerY + 40}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentTime}</text>\n`;
+  s += '</g>\n';
+  return s;
+}
+
+
+/**
+ * Draws the Navamsa chart (in SVG).
+ * @param {number} x - Top-left x offset.
+ * @param {number} y - Top-left y offset.
+ * @param {number} w - Chart width.
+ * @param {number} h - Chart height.
+ * @param {Array} planetDetails - Planet info array.
+ * @returns {string} An SVG string representing the Navamsa chart.
+ */
+function drawNavamsaChart(x, y, w, h, planetDetails) {
+  const mx = w / 4; // width of each house
+  const my = h / 4; // height of each house
+  let s = '<g>\n';
+  
+  // Glyph mapping: key = full name, value = new glyph.
+  const glyphMapping = {
+    'லக்னம்': 'லக்',
+    'சூரியன்':  'சூரி',
+    'சந்திரன்':  'சந்',
+    'செவ்வாய்': 'செவ்',
+    'புதன்': 'புத',
+    'குரு': 'குரு',
+    'சுக்கிரன்':  'சுக்',
+    'சனி': 'சனி',
+    'ராகு': 'ராகு',
+    'கேது': 'கேது',
+  };
+
+  // Create an array (for 12 houses) to group glyphs by navamsa.
+  let housePlanets = [];
+  for (let i = 0; i < 12; i++) {
+    housePlanets.push([]);
+  }
+  
+  // Group each planet’s glyph into its corresponding navamsa house.
+  planetDetails.forEach((planet) => {
+    let navamsaSign = calculateNavamsaPosition(planet.longitude);
+    const glyph = glyphMapping[planet.name] || planet.name;
+    housePlanets[navamsaSign].push(glyph);
+  });
+
+  // Draw the chart grid (houses).
+  housePositions.forEach((pos) => {
+    const xd = x + pos.col * mx;
+    const yd = y + pos.row * my;
+    s += `<rect x="${xd}" y="${yd}" width="${mx}" height="${my}" style="fill:none;stroke:black;stroke-width:2"/>\n`;
+  });
+  
+  // For each house, layout the glyphs in a two-column grid centered in the cell.
+  const rowHeight = 22; // vertical space for each row
+  for (let i = 0; i < 12; i++) {
+    const glyphs = housePlanets[i];
+    if (glyphs.length > 0) {
+      const pos = housePositions[i];
+      const cellX = x + pos.col * mx;
+      const cellY = y + pos.row * my;
+      const numRows = Math.ceil(glyphs.length / 2);
+      const totalGridHeight = numRows * rowHeight;
+      const verticalOffset = (my - totalGridHeight) / 2;
+      for (let j = 0; j < glyphs.length; j++) {
+        const row = Math.floor(j / 2);
+        const col = j % 2;
+        const glyphX = (glyphs.length === 1) ? cellX + (mx / 2) : cellX + (col === 0 ? (mx * 0.30) : (mx * 0.70));
+        const glyphY = cellY + verticalOffset + (row * rowHeight) + (rowHeight / 2);
+        s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="18" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${glyphs[j]}</text>\n`;
+      }
+    }
+  }
+  
+  // Center the Navamsa chart label.
+  const centerX = x + w / 2;
+  const centerY = y + h / 2;
+  s += `<text x="${centerX}" y="${centerY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">நவாம்சம்</text>\n`;
+  s += '</g>\n';
+  return s;
+}
+
+/**
+ * Display the main (Rasi) chart in an SVG container.
+ */
+function displayChart(planetaryPositions, year, month, day, hour, minutes) {
+  let currentDate = day + '-' + month + '-' + year;
+  let currentTime = formatAMPM(hour, minutes);
+
+  let svgContent = drawSouthChart(0, 0, 400, 400, planetaryPositions, currentDate, currentTime);
+  document.getElementById('chartContainer').innerHTML =
+    '<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg" version="1.1">' +
+    svgContent + '</svg>';
+}
+
+
+/**
+ * Display the Navamsa chart in an SVG container.
+ */
+function displayNavamsaChart(navamsaPositions) {
+  navamsaPositions.sort((a, b) => a.longitude - b.longitude);
+
+  let navamsaSvgContent = drawNavamsaChart(0, 0, 400, 400, navamsaPositions);
+  document.getElementById('navamsaChartContainer').innerHTML =
+    '<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg" version="1.1">' +
+    navamsaSvgContent + '</svg>';
+}
