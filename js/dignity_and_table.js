@@ -107,7 +107,7 @@ function displayPlanetaryTable(planetaryPositions, planetaryPositionsLater) {
       <tr>
         <td>${planet.houseNumber}</td>
         <td>${planet.name} ${retroSymbol}</td>
-        <td>${bhaagai}</td>
+        <td style="text-align:right">${bhaagai}</td>
         <td>${dignity}</td>
         <td>${planet.nakshatraPada}</td>
         <td>${planet.nakshatraLord}</td>
