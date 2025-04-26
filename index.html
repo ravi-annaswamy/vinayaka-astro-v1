@@ -42,13 +42,13 @@
     gap: 2px;
     justify-content: center;
   }
-  .chart-box {
-    flex: 1 1 400px;
-    min-width: 300px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    box-sizing: border-box;
-  }
+.chart-box {
+  flex: 1 1 300px; /* reduced from 400px */
+  min-width: 250px; /* reduced from 300px */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 5px; /* reduced from 10px */
+  box-sizing: border-box;
+}
 
   table {
     width: 100%;
@@ -107,23 +107,43 @@
     }
   }
 
-  .dasha-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 20px;
-  }
-  .dasha-container table {
-    border-collapse: collapse;
-    min-width: 200px;
-  }
-  .dasha-container th, .dasha-container td {
-    border: 1px solid #dddddd;
-    padding: 6px;
-  }
-  .dasha-container th {
-    background: #f2f2f2;
-  }
+ .dasha-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  /* margin-top: 20px; --> removed */
+}
+.dasha-container table {
+  border-collapse: collapse;
+  min-width: 200px;
+}
+.dasha-container th, .dasha-container td {
+  border: 1px solid #dddddd;
+  padding: 6px;
+}
+.dasha-container th {
+  background: #f2f2f2;
+}
+
+.result-dasha-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+#result, #dashasContainer {
+  flex: 1 1 400px;
+  min-width: 300px;
+  padding: 10px; /* slight inside breathing room */
+  border: 1px solid #eeeeee; /* light gray border */
+  background-color: #fafafa; /* very soft background */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* optional subtle shadow */
+  border-radius: 8px; /* slightly rounded corners */
+}
+
+
 </style>
 
 
@@ -323,10 +343,10 @@
     </div>
   </div>
 
-  <!-- Table of planetary positions -->
+<div class="result-dasha-container">
   <div id="result"></div>
+  <div id="dashasContainer"></div>
+</div>
 
-  <!-- Dasha listings -->
-  <div id="dashasContainer" style="margin-top: 20px;"></div>
 </body>
 </html>
