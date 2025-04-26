@@ -106,6 +106,36 @@
     }
   </style>
 
+<style>
+  select#city {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  select#city:focus {
+    border-color: #6c63ff;
+    box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+    background-color: #fff;
+    outline: none;
+  }
+
+  label[for="city"] {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+    font-size: 15px;
+  }
+
+  .form-control {
+    margin-bottom: 15px;
+  }
+</style>
+
+
   <script>
     function setDateToday() {
       var today = new Date();
@@ -258,26 +288,33 @@
     </select>
   </div>
 
-  <div class="form-control">
-    <label for="city">City:</label>
-    <select id="city">
-      <option value="Chennai">Chennai</option>
-      <option value="Tiruchirappalli">Tiruchy</option>
-      <option value="Madurai">Madurai</option>
-      <option value="Vellore">Vellore</option>
-      <option value="Salem">Salem</option>
-      <option value="Coimbatore">Coimbatore</option>
-      <option value="Krishnagiri">Krishnagiri</option>
-      <option value="Tirunelveli">Tirunelveli</option>
-      <option value="Kanyakumari">Kanyakumari</option>
-      <option value="Bengaluru">Hyderabad</option>
-      <option value="Hyderabad">Bengaluru</option>
-      <option value="Thiruvananthapuram">Thiruvananthapuram</option>
-      <option value="New Delhi">New Delhi</option>
-      <option value="New York, NY">New York</option>
-      <option value="Westlake, OH">Westlake</option>
-    </select>
-  </div>
+<div class="form-control">
+  <label for="city">City:</label>
+  <select id="city">
+    <option value="Chennai">Chennai</option>
+    <option value="Tiruchirappalli">Tiruchirappalli</option>
+    <option value="Madurai">Madurai</option>
+    <option value="Vellore">Vellore</option>
+    <option value="Salem">Salem</option>
+    <option value="Coimbatore">Coimbatore</option>
+    <option value="Krishnagiri">Krishnagiri</option>
+    <option value="Tirunelveli">Tirunelveli</option>
+    <option value="Kanyakumari">Kanyakumari</option>
+    <option value="Hyderabad">Hyderabad</option>
+    <option value="Bengaluru">Bengaluru</option>
+    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+    <option value="New Delhi">New Delhi</option>
+    <option value="Mumbai">Mumbai</option>
+    <option value="Kolkata">Kolkata</option>
+    <option value="London">London</option>
+    <option value="New York, NY">New York</option>
+    <option value="Westlake, OH">Westlake</option>
+    <option value="San Francisco, CA">San Francisco</option>
+    <option value="Chicago, IL">Chicago</option>
+    <option value="Houston, TX">Houston</option>
+    <option value="Phoenix, AZ">Phoenix</option>
+  </select>
+</div>
 
   <!-- Button to trigger calculation -->
   <div class="form-control">
