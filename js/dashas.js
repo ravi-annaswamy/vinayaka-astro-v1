@@ -149,11 +149,12 @@ function makeDashaTables(dashas, birthJD, offsetNow) {
 
     let rowStyle = (i === currIdx) ? ' style="background-color: #ccffcc;"' : '';
 
-    dashaTable += '<tr' + rowStyle + '>' +
+    dashaTable += '<tr' + rowStyle + ' onclick="showBhuktis(' + i + ')">' +
                   '<td>' + dashas[i].lord + '</td>' +
                   '<td>' + startDate + '</td>' +
                   '<td>' + endDate + '</td>' +
                   '</tr>';
+
   }
   dashaTable += '</tbody></table>';
 
@@ -207,6 +208,75 @@ function makeDashaTables(dashas, birthJD, offsetNow) {
            '<div class="dasha-item">' + bhuktiTable + '</div>' +
          '</div>';}
 
+function showBhuktis(mahadashaIndex) {
+  if (!window._storedDashas || !window._birthJD) return;
+
+  let dashas = window._storedDashas;
+  let birthJD = window._birthJD;
+  let todayJD = getSystemJD();
+  let offsetNow = todayJD - birthJD;
+
+  let subs = dashas[mahadashaIndex].subLords;
+  let currentDashaLord = dashas[mahadashaIndex].lord;
+
+  // Find which bhukti is running (if any) for the selected mahadasha
+  let currBhukti = -1;
+  for (let j = 0; j < subs.length; j++) {
+    let sStart = subs[j].startOffset ?? 999999;
+    let sEnd = subs[j].endOffset ?? 999999;
+    if (sStart <= offsetNow && offsetNow < sEnd) {
+      currBhukti = j;
+      break;
+    }
+  }
+
+  let bhuktiTable = '<h4>' + currentDashaLord + ' தசாபுக்தி வரிசை</h4>' +
+                    '<table><thead><tr>' +
+                    '<th>புக்தி</th>' +
+                    '<th>தொடக்கம்</th>' +
+                    '<th>முடிவு</th>' +
+                    '</tr></thead><tbody>';
+
+  for (let j = 0; j < subs.length; j++) {
+    let subStart = (subs[j].startOffset !== null)
+      ? jul2dateDDMMYYYY(birthJD + subs[j].startOffset)
+      : '---';
+    let subEnd = (subs[j].endOffset !== null)
+      ? jul2dateDDMMYYYY(birthJD + subs[j].endOffset)
+      : '---';
+
+    let rowStyle = (j === currBhukti) ? ' style="background-color: #ccffcc;"' : '';
+
+    bhuktiTable += '<tr' + rowStyle + '>' +
+                   '<td>' + subs[j].lord + '</td>' +
+                   '<td>' + subStart + '</td>' +
+                   '<td>' + subEnd + '</td>' +
+                   '</tr>';
+  }
+  bhuktiTable += '</tbody></table>';
+
+  // Replace only the second column (bhukti table)
+  const container = document.querySelector('.dasha-container');
+  if (container && container.children.length === 2) {
+    container.children[1].innerHTML = bhuktiTable;
+  }
+
+  // Highlight the clicked mahadasha row
+  const mahaTable = container.children[0].querySelector('table');
+  if (mahaTable) {
+    const rows = mahaTable.querySelectorAll('tbody tr');
+    rows.forEach((row, idx) => {
+      if (idx === mahadashaIndex) {
+        row.style.backgroundColor = '#ccffcc';  // Light green
+      } else {
+        row.style.backgroundColor = '';          // Remove background
+      }
+    });
+  }
+}
+
+
+
 /**
  * Example function to display dashas in older style.
  */
@@ -232,6 +302,8 @@ function displayDashas(planetaryPositions, birthJD) {
   }
   let nd = calcdasha(moon.longitude); // sets up dlist array
   let dashas = buildDashaData(birthJD, nd);
+  window._storedDashas = dashas;
+  window._birthJD = birthJD;
   let todayJD = getSystemJD();
   let offsetNow = todayJD - birthJD;
   let html = makeDashaTables(dashas, birthJD, offsetNow);
