@@ -80,37 +80,37 @@ function displayPlanetaryTable(planetaryPositions, planetaryPositionsLater) {
       <tr>
         <th>பாவம்</th>
         <th>கிரகம்</th>
+        <th>பாகை</th>
         <th>நிலை</th>
         <th>நட்சத்திரம்</th>
         <th>நட். அதிபதி</th>
-        <th>பாகை</th>
       </tr>
   `;
 
   planetaryPositions.forEach((planet) => {
-    // Find the same planet in the "later" array
     const planetLater = planetaryPositionsLater.find(p => p.name === planet.name);
     let retroSymbol = '';
 
-    // Check retrograde for all except Rahu/Ketu
     if (planet.name !== 'ராகு' && planet.name !== 'கேது' && planetLater) {
       if (isRetrograde(planet.longitude, planetLater.longitude)) {
-        retroSymbol = '(வ)'; // marker for retrograde
+        retroSymbol = '(வ)';
       }
     }
 
-    // Dignity
     let signIndex = signNameToIndex(planet.zodiacSign);
     let dignity = getDignity(planet.name, signIndex);
+
+    // Longitude modulo 30 with degree symbol
+    let bhaagai = `${Math.floor(planet.longitude % 30)}°`;
 
     table += `
       <tr>
         <td>${planet.houseNumber}</td>
         <td>${planet.name} ${retroSymbol}</td>
+        <td>${bhaagai}</td>
         <td>${dignity}</td>
         <td>${planet.nakshatraPada}</td>
         <td>${planet.nakshatraLord}</td>
-        <td>${Math.floor(planet.longitude)}</td>
       </tr>
     `;
   });
