@@ -141,6 +141,32 @@ function getCityInfo(cityName) {
   return cityData[cityName] || null;
 }
 
+const cityTamilNames = {
+  'Chennai': 'சென்னை',
+  'Tiruchirappalli': 'திருச்சிராப்பள்ளி',
+  'Madurai': 'மதுரை',
+  'Vellore': 'வேலூர்',
+  'Salem': 'சேலம்',
+  'Coimbatore': 'கோயம்புத்தூர்',
+  'Krishnagiri': 'கிருஷ்ணகிரி',
+  'Tirunelveli': 'திருநெல்வேலி',
+  'Kanyakumari': 'கன்னியாகுமரி',
+  'Hyderabad': 'ஹைதராபாத்',
+  'Bengaluru': 'பெங்களூரு',
+  'Thiruvananthapuram': 'திருவனந்தபுரம்',
+  'New Delhi': 'புதிய தில்லி',
+  'Mumbai': 'மும்பை',
+  'Kolkata': 'கொல்கத்தா',
+  'London': 'லண்டன்',
+  'New York, NY': 'நியூயார்க்',
+  'Westlake, OH': 'மேற்கு ஏரி',
+  'San Francisco, CA': 'சான் பிரான்சிஸ்கோ',
+  'Chicago, IL': 'சிகாகோ',
+  'Houston, TX': 'ஹூஸ்டன்',
+  'Phoenix, AZ': 'பீனிக்ஸ்'
+};
+
+
 /**
  * Adjusts timezone if city observes Daylight Saving Time.
  * Returns corrected timezone object.
