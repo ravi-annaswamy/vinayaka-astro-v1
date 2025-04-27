@@ -633,11 +633,11 @@ function displayPlanetaryTable(planetaryPositions, planetaryPositionsLater) {
   let table = `
     <table>
       <tr>
-        <th>பாவம்</th>
+        <th>பாவகம்</th>
         <th>கிரகம்</th>
         <th>நிலை</th>
-        <th>நட்சத்திரம்</th>
-        <th>நட். அதிபதி</th>
+        <th>நட்சத்திரம் <br> பாதம்</th>
+        <th>நட்சத்திர <br>அதிபதி</th>
         <th>பாகை</th>
       </tr>
   `;
@@ -810,7 +810,7 @@ function makeDashaTables(dashas, birthJD, offsetNow) {
 
   let dashaTable = '<h4>தசை வரிசை</h4>' +
                    '<table><thead><tr>' +
-                   '<th>மஹாதசை</th>' +
+                   '<th>மகாதசை</th>' +
                    '<th>தொடக்கம்</th>' +
                    '<th>முடிவு</th>' +
                    '</tr></thead><tbody>';

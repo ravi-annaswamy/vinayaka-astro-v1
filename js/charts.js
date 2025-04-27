@@ -111,8 +111,8 @@ function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime, cur
 
   const centerX = x + w / 2;
   const centerY = y + h / 2;
-  s += `<text x="${centerX}" y="${centerY - 20}" fill="black" font-size="12" font-family="monospace" text-anchor="middle">ஸ்ரீ கற்பக விநாயகர் துணை</text>\n`;
-  s += `<text x="${centerX}" y="${centerY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">ராசி</text>\n`;
+  s += `<text x="${centerX}" y="${centerY - 20}" fill="black" font-size="11" font-family="monospace" text-anchor="middle">ஸ்ரீ கற்பக விநாயகர்  துணை</text>\n`;
+  s += `<text x="${centerX}" y="${centerY}" fill="blue" font-size="15" font-family="monospace" font-weight="bold" text-anchor="middle">ராசி</text>\n`;
   s += `<text x="${centerX}" y="${centerY + 20}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentDate}</text>\n`;
   s += `<text x="${centerX}" y="${centerY + 40}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentTime}</text>\n`;
   s += `<text x="${centerX}" y="${centerY + 60}" fill="black" font-size="14" font-family="monospace" text-anchor="middle">${currentCity}</text>\n`; 
@@ -194,7 +194,7 @@ function drawNavamsaChart(x, y, w, h, planetDetails) {
   // Center the Navamsa chart label.
   const centerX = x + w / 2;
   const centerY = y + h / 2;
-  s += `<text x="${centerX}" y="${centerY}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">நவாம்சம்</text>\n`;
+  s += `<text x="${centerX}" y="${centerY}" fill="blue" font-size="16" font-family="monospace" font-weight="bold" font-color="blue" text-anchor="middle">நவாம்சம்</text>\n`;
   s += '</g>\n';
   return s;
 }

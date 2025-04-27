@@ -132,9 +132,9 @@ function buildDashaData(birthJD, natalDashaIndex) {
 function makeDashaTables(dashas, birthJD, offsetNow) {
   let currIdx = findCurrentDashaIndex(dashas, offsetNow);
 
-  let dashaTable = '<h4>தசை வரிசை</h4>' +
+  let dashaTable = '<h4>தசா வரிசை</h4>' +
                    '<table><thead><tr>' +
-                   '<th>மஹாதசை</th>' +
+                   '<th>மஹா தசா</th>' +
                    '<th>தொடக்கம்</th>' +
                    '<th>முடிவு</th>' +
                    '</tr></thead><tbody>';

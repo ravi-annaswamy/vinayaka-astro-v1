@@ -78,12 +78,12 @@ function displayPlanetaryTable(planetaryPositions, planetaryPositionsLater) {
   let table = `
     <table>
       <tr>
-        <th>பாவம்</th>
+        <th>பாவகம்</th>
         <th>கிரகம்</th>
         <th>பாகை</th>
         <th>நிலை</th>
-        <th>நட்சத்திரம்</th>
-        <th>நட். அதிபதி</th>
+        <th>நட்சத்திரம் <br> பாதம்</th>
+        <th>நட்சத்திர <br>அதிபதி</th>
       </tr>
   `;
 
@@ -107,7 +107,7 @@ function displayPlanetaryTable(planetaryPositions, planetaryPositionsLater) {
       <tr>
         <td>${planet.houseNumber}</td>
         <td>${planet.name} ${retroSymbol}</td>
-        <td style="text-align:right">${bhaagai}</td>
+        <td style="text-align:center">${bhaagai}</td>
         <td>${dignity}</td>
         <td>${planet.nakshatraPada}</td>
         <td>${planet.nakshatraLord}</td>
