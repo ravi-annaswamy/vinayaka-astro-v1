@@ -177,7 +177,7 @@ function makeDashaTables(dashas, birthJD, offsetNow) {
       }
     }
 
-    bhuktiTable = '<h4>' + currentDashaLord + ' தசாபுக்தி வரிசை</h4>' +
+    bhuktiTable = '<h4>' + currentDashaLord + ' தசை: புக்தி வரிசை</h4>' +
                   '<table><thead><tr>' +
                   '<th>புக்தி</th>' +
                   '<th>தொடக்கம்</th>' +
@@ -230,7 +230,7 @@ function showBhuktis(mahadashaIndex) {
     }
   }
 
-  let bhuktiTable = '<h4>' + currentDashaLord + ' தசை புக்தி வரிசை</h4>' +
+  let bhuktiTable = '<h4>' + currentDashaLord + ' தசை: புக்தி வரிசை</h4>' +
                     '<table><thead><tr>' +
                     '<th>புக்தி</th>' +
                     '<th>தொடக்கம்</th>' +
