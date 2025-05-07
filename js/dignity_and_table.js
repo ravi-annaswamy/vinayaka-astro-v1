@@ -101,7 +101,8 @@ function displayPlanetaryTable(planetaryPositions, planetaryPositionsLater) {
     let dignity = getDignity(planet.name, signIndex);
 
     // Longitude modulo 30 with degree symbol
-    let bhaagai = `${Math.floor(planet.longitude % 30)}°`;
+    let bhaagai = `${(planet.longitude % 30).toFixed(2)}°`;
+
 
     table += `
       <tr>

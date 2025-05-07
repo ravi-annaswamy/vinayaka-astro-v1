@@ -17,19 +17,6 @@ var housePositions = [
   { row: 0, col: 0 }  // Pisces
 ];
 
-/**
- * Draws the South Indian Rasi chart (in SVG) at specified coords and size.
- * Highlights houses 4,7,10 from Lagna in light blue, houses 5,9 from Lagna in light green,
- * and the Lagna house itself in light blue-green.
- * @param {number} x - Top-left x offset.
- * @param {number} y - Top-left y offset.
- * @param {number} w - Chart width.
- * @param {number} h - Chart height.
- * @param {Array} planetDetails - Planet info array.
- * @param {string} currentDate - String for the current date.
- * @param {string} currentTime - String for the current time.
- * @returns {string} An SVG string representing the chart.
- */
 function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime, currentCity) {
   const mx = w / 4;
   const my = h / 4;
@@ -48,14 +35,23 @@ function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime, cur
     'கேது': 'கேது',
   };
 
-  let housePlanets = [];
-  for (let i = 0; i < 12; i++) housePlanets.push([]);
+  let housePlanets = Array.from({length: 12}, () => []);
 
   planetDetails.forEach((planet) => {
     const houseIndex = Math.floor((planet.longitude % 360) / 30);
     const glyph = glyphMapping[planet.name] || planet.name;
-    housePlanets[houseIndex].push(glyph);
+    const degree = Math.ceil(planet.longitude % 30); // Round up to whole number
+    housePlanets[houseIndex].push({ glyph, degree });
   });
+
+  // Sort planets in each house as specified
+  for (let i = 0; i < 12; i++) {
+    if (i <= 5) { // Mesha to Kanya (Aries to Virgo)
+      housePlanets[i].sort((a, b) => a.degree - b.degree); // Ascending
+    } else { // Tula to Meena (Libra to Pisces)
+      housePlanets[i].sort((a, b) => b.degree - a.degree); // Descending
+    }
+  }
 
   let lagnaIndex = null;
   const ascPlanet = planetDetails.find(p => p.name === 'லக்னம்');
@@ -89,36 +85,39 @@ function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime, cur
     s += `<rect x="${xd}" y="${yd}" width="${mx}" height="${my}" style="fill:${fillColor};stroke:black;stroke-width:2"/>\n`;
   });
 
-  const rowHeight = 22;
+  const rowHeight = 20;
   for (let i = 0; i < 12; i++) {
-    const glyphs = housePlanets[i];
-    if (glyphs.length > 0) {
+    const planets = housePlanets[i];
+    if (planets.length > 0) {
       const pos = housePositions[i];
       const cellX = x + pos.col * mx;
       const cellY = y + pos.row * my;
-      const numRows = Math.ceil(glyphs.length / 2);
-      const totalGridHeight = numRows * rowHeight;
+      const totalGridHeight = planets.length * rowHeight;
       const verticalOffset = (my - totalGridHeight) / 2;
-      for (let j = 0; j < glyphs.length; j++) {
-        const row = Math.floor(j / 2);
-        const col = j % 2;
-        const glyphX = (glyphs.length === 1) ? cellX + (mx / 2) : cellX + (col === 0 ? (mx * 0.30) : (mx * 0.70));
-        const glyphY = cellY + verticalOffset + (row * rowHeight) + (rowHeight / 2);
-        s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="18" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${glyphs[j]}</text>\n`;
+      for (let j = 0; j < planets.length; j++) {
+        const glyphX = cellX + (mx * 0.35);
+        const degreeX = cellX + (mx * 0.75);
+        const glyphY = cellY + verticalOffset + (j * rowHeight) + (rowHeight / 2);
+        // Planet Glyph
+        s += `<text x="${glyphX}" y="${glyphY}" fill="black" font-size="18" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${planets[j].glyph}</text>\n`;
+        // Planet Degree (rounded up)
+        s += `<text x="${degreeX}" y="${glyphY}" fill="black" font-size="14" font-family="monospace" text-anchor="middle" dominant-baseline="middle">${planets[j].degree}°</text>\n`;
       }
     }
   }
 
   const centerX = x + w / 2;
   const centerY = y + h / 2;
-  s += `<text x="${centerX}" y="${centerY - 20}" fill="black" font-size="11" font-family="monospace" text-anchor="middle">ஸ்ரீ கற்பக விநாயகர்  துணை</text>\n`;
+  s += `<text x="${centerX}" y="${centerY - 20}" fill="black" font-size="11" font-family="monospace" text-anchor="middle">ஸ்ரீ கற்பக விநாயகர் துணை</text>\n`;
   s += `<text x="${centerX}" y="${centerY}" fill="blue" font-size="15" font-family="monospace" font-weight="bold" text-anchor="middle">ராசி</text>\n`;
   s += `<text x="${centerX}" y="${centerY + 20}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentDate}</text>\n`;
   s += `<text x="${centerX}" y="${centerY + 40}" fill="black" font-size="16" font-family="monospace" text-anchor="middle">${currentTime}</text>\n`;
-  s += `<text x="${centerX}" y="${centerY + 60}" fill="black" font-size="14" font-family="monospace" text-anchor="middle">${currentCity}</text>\n`; 
+  s += `<text x="${centerX}" y="${centerY + 60}" fill="black" font-size="14" font-family="monospace" text-anchor="middle">${currentCity}</text>\n`;
   s += '</g>\n';
+
   return s;
 }
+
 
 
 
