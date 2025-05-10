@@ -8,9 +8,10 @@
   <script src="js/constants.js"></script>
   <script src="js/astro_calc.js"></script>
   <script src="js/charts.js"></script>
+  <script src="js/cities.js"></script>
+  <script src="js/sunrise.js"></script>
   <script src="js/dignity_and_table.js"></script>
   <script src="js/dashas.js"></script>
-  <script src="js/cities.js"></script>
   <script src="js/date_utils.js"></script>
   <script src="js/planets.js"></script>
   <script src="js/planterms2.js"></script>
@@ -167,6 +168,28 @@
       document.getElementById('minute').value = minute;
     }
 
+function displayVedicInfo(year, month, day, hour, minute, city) {
+  const { sunriseStr, sunsetStr, sunriseMinutes, sunsetMinutes } =
+          getLocalSunriseSunset(year, month, day, city);
+
+  const dateStr = `${day}-${month}-${year}`;
+  const birthTimeStr = formatAMPM(hour, minute);
+
+  // Day of week 0=Sun…6=Sat in JS
+  const weekdayIndex = new Date(year, month-1, day).getDay();
+  const vedicWeekday = determineVedicWeekdayLocal(
+    hour, minute, sunriseMinutes, sunsetMinutes, weekdayIndex
+  );
+
+  document.getElementById('vedicInfo').innerHTML = `
+    பிறந்த தேதி: ${dateStr}, நேரம்: ${birthTimeStr},
+    சூரிய உதயம்: ${sunriseStr}, அஸ்தமனம்: ${sunsetStr},
+    வேதவழி நாள் பொழுது: ${vedicWeekday}
+  `;
+}
+
+
+
     // Main driver function
     function calculatePositions() {
       var year = document.getElementById('year').value;
@@ -186,15 +209,48 @@
 
       var planetaryPositions = calculatePlanetaryPositions(dateData.t, timeData, cityInfo);
 
+// 1. Determine Vedic period
+const { sunriseMinutes, sunsetMinutes } =
+      getLocalSunriseSunset(year, month, day, city);
+const birthMin = hour*60 + minutes;
+const weekdayIndex = new Date(year, month-1, day).getDay();
+const period = (birthMin >= sunriseMinutes && birthMin < sunsetMinutes)
+               ? 'day' : 'night';
+
+// 2. Lookup offset
+const offset = MAANTI_OFFSETS[weekdayIndex][period];
+
+// 3. Find Sun’s longitude
+const sunObj = planetaryPositions.find(p => p.name === 'சூரியன்');
+if (sunObj) {
+  const maantiLong = (sunObj.longitude + offset) % 360;
+
+  // 4. Build the Maanti object
+  const nak = calculateNakshatraPada(maantiLong);              // from dignities/table code :contentReference[oaicite:6]{index=6}:contentReference[oaicite:7]{index=7}
+  const signIdx = Math.floor(maantiLong / 30); 
+  const houseNum = (signIdx - Math.floor(sunObj.longitude/30) + 12)%12 + 1;
+
+  planetaryPositions.push({
+    name: 'மாந்தி',
+    longitude: parseFloat(maantiLong.toFixed(1)),
+    zodiacSign: indianZodiacTamil[signIdx],
+    nakshatraPada: nak.nakshatra + ' ' + nak.pada,
+    nakshatraLord: nakshatraLordsTamil[Math.floor(maantiLong/13.333)],
+    houseNumber: houseNum
+  });
+}
+
       // Compute positions 12 hours later to check retrograde
       var halfDayInT = 0.5 / 36525; // 0.5 day in Julian Centuries
       var planetaryPositionsLater =
           calculatePlanetaryPositions(dateData.t + halfDayInT, timeData, cityInfo);
 
+
       displayChart(planetaryPositions, year, month, day, hour, minutes);
 
       var navamsaPositions = calculateNavamsaPositions(planetaryPositions);
       displayNavamsaChart(navamsaPositions, dateData);
+      displayVedicInfo(year, month, day, hour, minutes, city);
 
       displayPlanetaryTable(planetaryPositions, planetaryPositionsLater);
 
@@ -202,15 +258,15 @@
     }
 
     // Extract and adjust time data
-    function extractTimeData(hour, minutes, cityInfo) {
-      var zoneHours = parseFloat(cityInfo.timezone.hours) +
-                      parseFloat(cityInfo.timezone.minutes / 60);
-      if (cityInfo.timezone.direction === 'E') {
-        zoneHours *= -1;
-      }
-      var time = parseFloat(hour) + parseFloat(minutes / 60) + zoneHours;
-      return { time: time, zoneHours: zoneHours };
-    }
+function extractTimeData(hour, minutes, cityInfo) {
+  var zoneHours = parseFloat(cityInfo.timezone.hours) +
+                  parseFloat(cityInfo.timezone.minutes / 60);
+  if (cityInfo.timezone.direction === 'E') {
+    zoneHours *= -1;  
+  }
+  var time = parseFloat(hour) + parseFloat(minutes / 60) + zoneHours;
+  return { time: time, zoneHours: zoneHours };
+}
 
     // Calculate Julian date/time factor
     function calculateDateData(year, month, day, time) {
@@ -345,6 +401,9 @@
       <!-- SVG Navamsa chart inserted here -->
     </div>
   </div>
+  <div id="vedicInfo" style="text-align:center; margin-top:20px; font-size:16px; font-family:Arial, sans-serif;">
+  </div>
+
 
 <div class="result-dasha-container">
   <div id="result"></div>

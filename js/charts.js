@@ -33,6 +33,7 @@ function drawSouthChart(x, y, w, h, planetDetails, currentDate, currentTime, cur
     'சனி': 'சனி',
     'ராகு': 'ராகு',
     'கேது': 'கேது',
+    'மாந்தி': 'மா',
   };
 
   let housePlanets = Array.from({length: 12}, () => []);
@@ -147,6 +148,8 @@ function drawNavamsaChart(x, y, w, h, planetDetails) {
     'சனி': 'சனி',
     'ராகு': 'ராகு',
     'கேது': 'கேது',
+    'மாந்தி': 'மா',
+
   };
 
   // Create an array (for 12 houses) to group glyphs by navamsa.

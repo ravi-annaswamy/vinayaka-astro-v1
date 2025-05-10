@@ -103,6 +103,17 @@ var nakshatraLordsTamil = [
   'குரு', 'சனி', 'புதன்'
 ];
 
+const MAANTI_OFFSETS = {
+  0: { day: 156, night: 240 },    // Sunday
+  1: { day: 132,  night: 216 },   // Monday
+  2: { day: 108, night: 192 },    // Tuesday
+  3: { day: 84, night: 336 },    // Wednesday
+  4: { day: 60, night: 312 },    // Thursday 
+  5: { day: 36, night: 288 },    // Friday
+  6: { day: 12, night: 264 },    // Saturday 
+};
+
+
 var sml = false,
     plstr = 'AsSuMoMaMeJuVeSaRaKe',
     zdstr = 'ArTaGeCnLeViLiScSgCpAqPi',

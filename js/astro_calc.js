@@ -52,6 +52,7 @@ function calculatePlanetaryPositions(t, timeData, cityInfo) {
   let as = ascendant(t, timeData.time, lon, lat); // user-provided ascendant() function
   let pp = new Array(10);
   pp[0] = as;
+  console.log(as);
 
   // Populate other planet positions
   planets(t, pp, 1); // user-provided planets() function
