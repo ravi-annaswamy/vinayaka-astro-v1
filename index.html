@@ -182,10 +182,10 @@ function displayVedicInfo(year, month, day, hour, minute, city) {
   );
 
   document.getElementById('vedicInfo').innerHTML = `
-    பிறந்த தேதி: ${dateStr}, நேரம்: ${birthTimeStr},
-    சூரிய உதயம்: ${sunriseStr}, அஸ்தமனம்: ${sunsetStr},
-    வேதவழி நாள் பொழுது: ${vedicWeekday}
-  `;
+    <p>பிறந்த தேதி: ${dateStr}, நேரம்: ${birthTimeStr}</p>
+    <p>சூரிய உதயம்: ${sunriseStr}, அஸ்தமனம்: ${sunsetStr}</p>
+    <p>வேதவழி நாள் பொழுது: ${vedicWeekday}</p>
+` ;
 }
 
 
@@ -267,7 +267,12 @@ function addMaantiPosition(targetArray, birthInfo, positions) {
   // Derive nakshatra, sign, pada, lord, and house
   const nak = calculateNakshatraPada(maantiLong);
   const signIdx = Math.floor(maantiLong / 30);
-  const houseNum = ((signIdx - Math.floor(sun.longitude / 30) + 12) % 12) + 1;
+
+  // Calculate house number from ascendant sign
+  // first find the ascendant’s longitude
+  const asc = positions.find(p => p.name === 'லக்னம்');
+  const ascSignIdx = Math.floor(asc.longitude / 30);
+  const houseNum = ((signIdx - ascSignIdx + 12) % 12) + 1;
 
   targetArray.push({
     name: 'மாந்தி',
