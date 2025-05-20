@@ -67,6 +67,13 @@ function getCityInfo(cityName) {
       timezoneName: 'Asia/Kolkata',
       dst: false
     },
+    'Ramanathapuram': {
+      latitude: { degrees: 9, minutes: 23, direction: 'N' },
+      longitude: { degrees: 78, minutes: 50, direction: 'E' },
+      timezone: { hours: 5, minutes: 30, direction: 'E' },
+      timezoneName: 'Asia/Kolkata',
+      dst: false
+    },
     'Hyderabad': {
       latitude: { degrees: 17, minutes: 23, direction: 'N' },
       longitude: { degrees: 78, minutes: 27, direction: 'E' },
@@ -167,6 +174,7 @@ const cityTamilNames = {
   'Chennai': 'சென்னை',
   'Tiruchirappalli': 'திருச்சிராப்பள்ளி',
   'Madurai': 'மதுரை',
+  'Ramanathapuram': 'ராமனாதபுரம்',  
   'Vellore': 'வேலூர்',
   'Salem': 'சேலம்',
   'Coimbatore': 'கோயம்புத்தூர்',
