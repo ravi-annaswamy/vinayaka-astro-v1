@@ -102,6 +102,13 @@ function getCityInfo(cityName) {
       timezoneName: 'Asia/Kolkata',
       dst: false
     },
+    'Colombo': {
+    latitude:  { degrees: 6,  minutes: 56, direction: 'N' },
+    longitude: { degrees: 79, minutes: 51, direction: 'E' },
+    timezone:  { hours: 5,  minutes: 30, direction: 'E' },
+    timezoneName: 'Asia/Colombo',
+    dst: false
+    },
     'New York, NY': {
       latitude: { degrees: 40, minutes: 43, direction: 'N' },
       longitude: { degrees: 74, minutes: 0, direction: 'W' },
@@ -188,6 +195,7 @@ const cityTamilNames = {
   'Mumbai': 'மும்பை',
   'Kolkata': 'கொல்கத்தா',
   'London': 'லண்டன்',
+  'Colombo': 'கொழும்பு',
   'New York, NY': 'நியூயார்க்',
   'Westlake, OH': 'வெஸ்ட்லேக்',
   'San Francisco, CA': 'சான் பிரான்சிஸ்கோ',
