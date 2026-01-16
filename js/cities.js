@@ -67,6 +67,13 @@ function getCityInfo(cityName) {
       timezoneName: 'Asia/Kolkata',
       dst: false
     },
+    'Karaikkudi': {
+      latitude: { degrees: 10, minutes: 4, direction: 'N' },
+      longitude: { degrees: 78, minutes: 47, direction: 'E' },
+      timezone: { hours: 5, minutes: 30, direction: 'E' },
+      timezoneName: 'Asia/Kolkata',
+      dst: false
+    },
     'Ramanathapuram': {
       latitude: { degrees: 9, minutes: 23, direction: 'N' },
       longitude: { degrees: 78, minutes: 50, direction: 'E' },
@@ -181,6 +188,7 @@ const cityTamilNames = {
   'Chennai': 'சென்னை',
   'Tiruchirappalli': 'திருச்சிராப்பள்ளி',
   'Madurai': 'மதுரை',
+  'Karaikkudi': 'காரைக்குடி',
   'Ramanathapuram': 'ராமனாதபுரம்',  
   'Vellore': 'வேலூர்',
   'Salem': 'சேலம்',
